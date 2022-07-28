@@ -5,16 +5,15 @@ web3.eth.handleRevert = true;
 const chainId = 43113;
 
 module.exports = {
-  // 通过私钥签名交易
   async sendTransaction(
     targetContract, methodName, accountPrivateKey, arguments) {
     try {
       const account =
         web3.eth.accounts.privateKeyToAccount(accountPrivateKey)
-          .address;  // 私钥导出公钥
+          .address;
       const to = targetContract.options.address;
       const nonce = web3.utils.numberToHex(
-        await web3.eth.getTransactionCount(account));  // 获取生成 nonce
+        await web3.eth.getTransactionCount(account));
       const data = targetContract.methods[methodName]
         .apply(targetContract.methods, arguments)
         .encodeABI();  // encode ABI
@@ -23,11 +22,9 @@ module.exports = {
       let gasPrice = await web3.eth.getGasPrice();
       gasPrice = 50000000000;
 
-      // 准备交易数据
       const tx = { account, to, chainId, data, nonce, gasPrice, gas };
       // console.log(tx);
 
-      // 签名交易
       let signTx =
         await web3.eth.accounts.signTransaction(tx, accountPrivateKey);
       let ret = await web3.eth.sendSignedTransaction(signTx.rawTransaction);
